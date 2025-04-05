@@ -1,13 +1,27 @@
-
-
 const express = require('express');
+const dotenv = require('dotenv');
 const cors = require('cors');
 const { Storage } = require('@google-cloud/storage');
 const fs = require('fs');
 const path = require('path');
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+
+app.use(express.json());
+app.use(cors());
+
+const PORT = process.env.PORT || 8080; // ✅ Change default port to 8080 for Cloud Run
+
+// ✅ Required endpoint for Cloud Run health check
+app.get('/', (req, res) => {
+    res.send('Server is running on Google Cloud Run');
+});
+
+// ✅ Listening on all network interfaces (0.0.0.0) for Cloud Run compatibility
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 
 // 🔹 Google Cloud Storage setup
 const storage = new Storage({
@@ -305,9 +319,4 @@ app.post('/upload-tracking', async (req, res) => {
 
 app.get("/", (req, res) => {
     res.send("Server is running!");
-});
-
-
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
 });
